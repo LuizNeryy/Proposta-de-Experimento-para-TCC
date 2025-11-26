@@ -6,7 +6,7 @@
 Análise Longitudinal do Impacto da Complexidade Ciclomática e Consumo de Recursos no Desempenho Temporal (Loop Rate) de Firmware Automotivo (Speeduino).
 
 ### 1.2 ID / código
-`EXP-MES-2025-SPEEDUINO-01`
+`0001-SpeeduinoTCC`
 
 ### 1.3 Versão do documento e histórico de revisão
 * **Versão:** v2.0 (Ajuste para Entrega 2)
