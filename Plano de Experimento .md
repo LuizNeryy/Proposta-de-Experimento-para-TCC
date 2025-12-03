@@ -3,167 +3,291 @@
 ## 1. Identificação básica
 
 ### 1.1 Título do experimento
-Análise Longitudinal do Impacto da Complexidade Ciclomática e Consumo de Recursos no Desempenho Temporal (Loop Rate) de Firmware Automotivo (Speeduino).
+**Análise Longitudinal da Correlação entre Complexidade de Código e Desempenho Temporal (Loop Rate) no Firmware Speeduino em Hardware Limitado.**
 
 ### 1.2 ID / código
-`EXP-MES-2025-SPEEDUINO-01`
+`EXP-MES-2025-SPEEDUINO-FINAL`
 
 ### 1.3 Versão do documento e histórico de revisão
-* **Versão:** v2.0 (Ajuste para Entrega 2)
+* **Versão Atual:** v3.0 (Versão Final Estendida)
 * **Histórico:**
-    * 19/11/2025: v1.0 - Criação do documento inicial.
-    * 25/11/2025: v2.0 - Expansão do GQM, inclusão de tabelas de métricas e refinamento de escopo conforme requisitos da Entrega 2.
+    * v1.0 (19/11/2025): Esboço inicial do escopo.
+    * v2.0 (25/11/2025): Expansão do GQM e métricas.
+    * v3.0 (02/12/2025): Detalhamento completo do desenho experimental, hipóteses estatísticas e protocolo de execução para trabalho final.
 
 ### 1.4 Datas (criação, última atualização)
 * **Criação:** 19/11/2025
-* **Última atualização:** 25/11/2025
+* **Última atualização:** 02/12/2025
 
 ### 1.5 Autores (nome, área, contato)
 * **Autor:** Luiz Filipe Nery Costa
-* **Área:** Engenharia de Software
+* **Área:** Engenharia de Software / Sistemas Embarcados
 * **Contato:** lfncosta@sga.pucminas.br
 
 ### 1.6 Responsável principal (PI / dono do experimento)
-* **Aluno Responsável:** Luiz Filipe Nery Costa
-* **Professor Supervisor:** Prof. Danilo
+* **Investigador Principal:** Luiz Filipe Nery Costa
+* **Orientador Acadêmico:** Prof. Danilo
 
 ### 1.7 Projeto / produto / iniciativa relacionada
-Este experimento integra a avaliação da disciplina de **Medição e Experimentação de Software**. O estudo é uma Prova de Conceito (*PoC*) para TCC, focado na análise de *Software Bloat* em Sistemas Embarcados Automotivos Críticos, utilizando o firmware *Speeduino* como objeto de estudo.
+Este experimento está vinculado ao projeto de código aberto **Speeduino** (sistema de injeção eletrônica e ignição). Ele serve como o artefato principal da disciplina de **Medição e Experimentação de Software** e constitui a fundamentação metodológica para o Trabalho de Conclusão de Curso (TCC) focado na obsolescência de software em sistemas críticos.
 
 ---
 
 ## 2. Contexto e problema
 
 ### 2.1 Descrição do problema / oportunidade
-Sistemas de injeção eletrônica (ECUs) operam em *hard real-time*. O projeto *Speeduino* cresceu significativamente em funcionalidades (Turbo, VVT, CAN Bus). O problema investigado é se esse crescimento (aumento de complexidade e tamanho) degradou a frequência de operação (*Loop Rate*) em hardwares limitados (Arduino Mega), a ponto de comprometer a segurança ou viabilidade técnica em motores de alta rotação.
+O problema central abordado é o fenômeno conhecido como *Software Bloat* (inchaço de software) em sistemas de tempo real crítico (*Hard Real-Time*). No contexto automotivo, uma ECU (Unidade de Controle do Motor) precisa ler sensores, calcular a mistura de combustível e disparar a ignição em janelas de tempo de milissegundos.
+Observou-se, através de relatos da comunidade, que as versões mais recentes do Speeduino, repletas de novas funcionalidades (como controle de VVT, mapas 3D complexos e CAN Bus), apresentam uma frequência de operação (*Loop Rate*) menor quando instaladas no hardware original recomendado (Arduino Mega 2560).
+A oportunidade deste estudo é medir objetivamente se o aumento da complexidade estrutural do código (complexidade ciclomática) é a causa raiz dessa degradação de desempenho, determinando se o hardware "legado" ainda é seguro para motores de alta rotação.
 
 ### 2.2 Contexto organizacional e técnico
-* **Ambiente:** Acadêmico/Laboratorial (Simulação HIL - Hardware-in-the-Loop).
-* **Domínio:** Sistemas Embarcados Automotivos.
-* **Hardware:** ATmega2560 (Arduino Mega R3).
+* **Organização:** O estudo é conduzido no âmbito acadêmico (Laboratório de Engenharia de Software da PUC Minas).
+* **Domínio:** Sistemas Embarcados Automotivos (*Automotive Embedded Systems*).
+* **Tecnologias:** Linguagem C/C++, Arquitetura AVR (8-bit), Compilador GCC.
 * **Ferramentas:**
-    * *Análise Estática:* Lizard (Python) e Arduino Compiler (avr-gcc).
-    * *Dinâmica:* TunerStudio MS (Telemetria Serial).
+    * *Lizard:* Ferramenta de análise estática em Python para medir complexidade.
+    * *TunerStudio MS:* Software padrão da indústria para calibração e telemetria de injeções programáveis.
+    * *Arduino IDE:* Ambiente de compilação e upload.
 
-### 2.3 Trabalhos e evidências prévias
-* **Literatura:** As Leis de Lehman (evolução de software aumenta complexidade se não mitigada).
-* **Comunidade:** Relatos empíricos de que versões pós-2022 são "mais lentas" para conectar ou manter sincronismo em altas RPMs comparadas a versões de 2017.
+### 2.3 Trabalhos e evidências prévias (internos e externos)
+* **Literatura Externa:** As *Leis de Lehman* sobre a evolução de software, especificamente a lei da "Complexidade Crescente", afirmam que à medida que um sistema evolui, sua complexidade aumenta a menos que haja trabalho explícito para reduzi-la.
+* **Estudos Similares:** Pesquisas anteriores sobre o kernel do Linux mostram correlação entre tamanho do código e latência em processadores antigos.
+* **Evidências Internas:** Nos fóruns do Speeduino, usuários relatam que versões anteriores a 2020 rodavam a 400Hz, enquanto versões atuais rodam próximas a 250Hz na mesma configuração.
 
 ### 2.4 Referencial teórico e empírico essencial
-* **Complexidade Ciclomática (McCabe):** Medida de caminhos independentes no código.
-* **Sistemas de Tempo Real:** Importância do *Loop Frequency* (Hz) para amostragem de sensores (Teorema de Nyquist).
-* **Recursos Embarcados:** Impacto do uso de SRAM (Heap/Stack) na latência de execução.
+* **Complexidade Ciclomática (McCabe):** Métrica que conta o número de caminhos linearmente independentes através do código fonte. Quanto maior o número, maior a lógica condicional (`if`, `while`, `for`) e, teoricamente, maior o custo de processamento.
+* **Teorema de Nyquist-Shannon:** Para controlar um motor a 8000 RPM (133 rotações por segundo), o sistema precisa amostrar e processar dados a uma frequência mínima (Nyquist rate) para não perder eventos de ignição.
+* **Sistemas de Tempo Real:** A previsibilidade temporal é mais importante que a velocidade média. Atrasos no *Loop Rate* significam atrasos no ponto de ignição, o que pode danificar o motor.
 
 ---
 
-## 3. Objetivos e questões (GQM)
+## 3. Objetivos e questões (Goal / Question / Metric)
 
-### 3.1 Objetivo Geral
-**Analisar** o firmware Speeduino (código-fonte e binário), **com o propósito de** avaliar a correlação entre evolução da complexidade, consumo de memória e desempenho temporal, **com relação a** eficiência de processamento (*Loop Rate*) e manutenibilidade, **do ponto de vista do** Engenheiro de Software, **no contexto de** microcontroladores AVR 8-bit executando versões de 2017 a 2024.
+### 3.1 Objetivo geral (Goal template)
+**Analisar** o histórico de versões do firmware Speeduino,
+**com o propósito de** caracterizar e correlacionar o aumento da complexidade de código com a degradação de desempenho,
+**com relação a** frequência de execução do laço principal (*Loop Rate*) e consumo de memória,
+**do ponto de vista do** Engenheiro de Software e Integrador de Sistemas,
+**no contexto de** microcontroladores de recursos limitados (Arduino Mega 2560) executando versões estáveis de 2017 a 2024.
 
-### 3.2, 3.3 e 3.4 Matriz GQM (Objetivos Específicos, Questões e Métricas)
+### 3.2 Objetivos específicos
+* **O1:** Mapear a evolução do tamanho e complexidade lógica do código ao longo de 7 anos.
+* **O2:** Determinar a queda percentual de desempenho (Hz) entre a versão mais antiga e a mais recente.
+* **O3:** Testar estatisticamente se a Complexidade Ciclomática é um preditor confiável para a queda de desempenho.
+* **O4:** Estabelecer um "limiar de obsolescência", indicando em qual ano/versão o hardware Arduino Mega deixou de ser ideal para aplicações de alta performance.
 
-| Objetivo Específico | Questões de Pesquisa (Questions) | Métricas Associadas (Metrics) |
-| :--- | :--- | :--- |
-| **O1.** Quantificar a evolução estrutural e de tamanho do firmware ao longo das releases. | **Q1.1** O tamanho físico do projeto (linhas de código e arquivos) cresceu de forma linear ou exponencial? | • M1: Total NLOC<br>• M2: File Count |
-| | **Q1.2** A complexidade lógica média das funções aumentou ou se manteve estável com as novas funcionalidades? | • M3: Average CCN<br>• M4: Function Count |
-| | **Q1.3** Existem "hotspots" de complexidade que surgiram nas versões mais recentes (funções gigantes)? | • M5: Max CCN<br>• M3: Average CCN |
-| **O2.** Medir o consumo de recursos de hardware (Memória e Processamento) em cada versão. | **Q2.1** Qual é a frequência de operação basal (*Idle Loop Rate*) de cada versão no hardware de referência? | • M6: Loop Rate (Hz)<br>• M7: Delta Performance (%) |
-| | **Q2.2** O binário compilado está se aproximando do limite físico da memória Flash do microcontrolador? | • M8: Flash Usage (Bytes)<br>• M9: Flash Usage (%) |
-| | **Q2.3** O consumo de memória RAM dinâmica (variáveis globais) aumentou significativamente? | • M10: SRAM Usage (Bytes)<br>• M11: SRAM Usage (%) |
-| **O3.** Correlacionar métricas de código estáticas com o desempenho dinâmico. | **Q3.1** Existe correlação estatística entre o aumento da Complexidade Ciclomática (CCN) e a queda do Loop Rate? | • M3: Average CCN<br>• M6: Loop Rate (Hz) |
-| | **Q3.2** O aumento do tamanho do binário (Flash) impacta diretamente na velocidade de execução? | • M8: Flash Usage (Bytes)<br>• M6: Loop Rate (Hz) |
-| | **Q3.3** O aumento no número de funções e arquivos impactou a performance geral? | • M4: Function Count<br>• M7: Delta Performance (%) |
-| **O4.** Avaliar a viabilidade técnica das versões modernas no hardware legado. | **Q4.1** A versão mais recente ainda mantém um Loop Rate acima do mínimo seguro para 8000 RPM? | • M6: Loop Rate (Hz)<br>• M12: Safe Threshold Margin |
-| | **Q4.2** Qual foi a taxa de degradação anual média do desempenho? | • M7: Delta Performance (%)<br>• M13: Years since Baseline |
-| | **Q4.3** A manutenibilidade do código (densidade de comentários) piorou conforme o projeto cresceu? | • M14: Comment Density<br>• M1: Total NLOC |
+### 3.3 Questões de pesquisa / de negócio
+* **QP1:** O aumento da Complexidade Ciclomática média (Avg CCN) do firmware apresenta uma tendência linear de crescimento ao longo das versões?
+* **QP2:** Existe uma diferença estatisticamente significativa no *Loop Rate* (Hz) entre as versões antigas (Legacy) e as modernas?
+* **QP3:** Qual a força da correlação (R de Pearson/Spearman) entre o aumento da complexidade total do projeto e a redução da frequência de operação?
 
-### 3.5 Tabela de Definição de Métricas
-
-| ID | Nome da Métrica | Descrição | Unidade | Fonte de Dados |
-|:---|:---|:---|:---|:---|
-| **M1** | Total NLOC | Número total de linhas de código (excluindo comentários e vazios). | Linhas (int) | Lizard |
-| **M2** | File Count | Número total de arquivos de código fonte (.ino, .cpp, .h) analisados. | Arquivos (int) | Lizard / OS |
-| **M3** | Average CCN | Média da Complexidade Ciclomática de todas as funções do projeto. | Score (float) | Lizard |
-| **M4** | Function Count | Número total de funções detectadas no projeto. | Funções (int) | Lizard |
-| **M5** | Max CCN | O maior valor de Complexidade Ciclomática encontrado em uma única função. | Score (int) | Lizard |
-| **M6** | Loop Rate | Frequência de execuções do laço principal por segundo em repouso. | Hz | TunerStudio |
-| **M7** | Delta Performance | Variação percentual de desempenho em relação à versão base (2017). | % | Calculado |
-| **M8** | Flash Usage (Bytes)| Tamanho do binário compilado ocupando a memória de programa. | Bytes | Compilador (avr-size) |
-| **M9** | Flash Usage (%) | Percentual da memória Flash total (256KB) ocupada. | % | Compilador |
-| **M10**| SRAM Usage (Bytes)| Quantidade de memória RAM alocada para variáveis globais estáticas. | Bytes | Compilador (avr-size) |
-| **M11**| SRAM Usage (%) | Percentual da memória SRAM total (8KB) ocupada. | % | Compilador |
-| **M12**| Safe Threshold | Margem de segurança entre o Loop Rate medido e o mínimo teórico (ex: 100Hz). | Hz | Calculado |
-| **M13**| Years Time | Tempo decorrido em anos desde a primeira versão analisada. | Anos | Metadados Git |
-| **M14**| Comment Density | Razão entre linhas de comentário e linhas totais, indicando documentação. | % | Lizard/Cloc |
+### 3.4 Métricas associadas (GQM)
+* **Para QP1:**
+    * *M1 - Average CCN:* Média da complexidade de todas as funções (Fonte: Lizard).
+    * *M2 - NLOC:* Número de linhas de código efetivas (Fonte: Lizard).
+* **Para QP2:**
+    * *M3 - Mean Loop Rate:* Média aritmética de 60 amostras de frequência por segundo (Unidade: Hz, Fonte: TunerStudio).
+* **Para QP3:**
+    * *M4 - Correlation Coefficient:* Valor estatístico calculado cruzando M1 e M3.
 
 ---
 
 ## 4. Escopo e contexto do experimento
 
-### 4.1 Escopo funcional / de processo
-* **Incluído (In-Scope):**
-    * Análise de 5 a 6 versões "Major Stable" do Speeduino (ex: 2017, 2019, 2021, 2023, 2024).
-    * Compilação direcionada para o target `MEGA2560`.
-    * Coleta de métricas estáticas de todo o diretório fonte.
-    * Coleta dinâmica apenas em estado "Idle" (Key-On, Engine-Off) para isolar a variável de processamento de código.
-* **Excluído (Out-of-Scope):**
-    * Testes com motor em funcionamento real (risco de danos).
-    * Análise de outras arquiteturas (STM32, Teensy) ou outros firmwares (RusEFI).
-    * Análise de consumo de energia elétrica (mA).
+### 4.1 Escopo funcional / de processo (incluído e excluído)
+* **Incluído:** Serão analisadas apenas as *Major Releases* (versões principais) lançadas anualmente (ex: 2017.01, 2018.01, etc.). O teste é feito em bancada, com o Arduino conectado via USB ao computador, sem estar ligado a um motor real. O perfil de configuração ("Tune") será o padrão "Base Tune" para garantir que todas as versões processem a mesma lógica de motor.
+* **Excluído:** Não serão analisadas versões "Nightly" ou "Beta" instáveis. Não serão testados hardwares alternativos (STM32, Teensy) nem configurações complexas (como 8 cilindros sequenciais), pois isso introduziria variáveis de confusão.
 
 ### 4.2 Contexto do estudo
-* **Organização:** Acadêmica (Laboratório de Engenharia de Software da PUC Minas).
-* **Projeto:** Speeduino (Open Source, licença GPL), desenvolvido por comunidade global.
-* **Criticidade:** Alta. O software controla injeção e ignição; falhas causam desligamento do motor.
-* **Participante:** Aluno de graduação com perfil Sênior em desenvolvimento, atuando como experimentador.
+O estudo é classificado como um **experimento controlado in vitro** (em laboratório). O "participante" não é humano, mas sim o sistema computacional. O ambiente é estático e controlado para evitar interferências externas (temperatura, ruído elétrico). A criticidade é alta, pois o software analisado controla segurança veicular.
 
 ### 4.3 Premissas
-1.  O *overhead* de comunicação serial (telemetria) é constante em todas as versões e não distorcerá a comparação relativa do *Loop Rate*.
-2.  As versões antigas do código (Legacy) são compatíveis com o compilador `avr-gcc` atual disponível na Arduino IDE 2.x.
-3.  O hardware (Arduino Mega) mantém clock estável de 16MHz durante todos os testes (sem *thermal throttling*).
+1.  Assume-se que o método de cálculo de *Loop Rate* interno do Speeduino não sofreu alterações algorítmicas que invalidem a comparação entre versões (ex: a forma como ele conta os segundos é a mesma).
+2.  Assume-se que o compilador `avr-gcc` utilizado para gerar os binários será mantido na mesma versão de otimização (`-O2` ou `-Os`) para todos os testes.
 
 ### 4.4 Restrições
-* **Tempo:** O experimento deve ser executado e tabulado em 2 semanas.
-* **Recursos:** Apenas 1 unidade física de teste disponível.
-* **Ferramentas:** Uso exclusivo de ferramentas gratuitas/open-source (Lizard, Arduino IDE, Versão free do TunerStudio).
+* **Hardware Único:** Todo o experimento será rodado na mesma placa física Arduino Mega para eliminar variações de fabricação do silício.
+* **Orçamento:** Zero. Uso de ferramentas gratuitas.
+* **Tempo:** O experimento de coleta de dados deve durar no máximo 5 dias úteis.
 
 ### 4.5 Limitações previstas
-* **Validade Externa:** Os resultados são válidos apenas para a arquitetura AVR de 8-bits. Processadores modernos de 32-bits podem mascarar a complexidade devido ao alto poder de processamento.
-* **Validade de Construção:** A métrica CCN mede caminhos lógicos, mas não necessariamente o custo computacional de cada instrução (uma linha complexa matematicamente pode pesar mais que 10 `if`s simples).
+* **Validade Externa:** Os resultados aplicam-se estritamente à arquitetura AVR 8-bit. Não é possível generalizar os achados para processadores ARM 32-bit, que possuem *pipelines* e *caches* que lidam com complexidade de forma diferente.
+* **Cenário Sintético:** O teste em "repouso" (Idle) não estressa o processador com interrupções de hardware (sinais de roda fônica) que ocorrem em um motor real.
 
 ---
 
 ## 5. Stakeholders e impacto esperado
 
 ### 5.1 Stakeholders principais
-* **Experimentador (Aluno):** Executor da coleta e análise.
-* **Supervisor Acadêmico:** Validador metodológico.
-* **Comunidade Speeduino (Users):** Proprietários de carros antigos usando Arduino Mega.
-* **Maintainers do Projeto:** Desenvolvedores que aprovam PRs no GitHub.
+* **Pesquisador (Aluno):** Responsável pela execução.
+* **Comunidade de Usuários Speeduino:** Grupo que utiliza o hardware legado e sofre com lentidão.
+* **Mantenedores do Projeto (Devs):** Responsáveis por aceitar ou rejeitar novas funcionalidades.
 
-### 5.2 Interesses e expectativas
-* **Aluno:** Validar hipótese de TCC e aprovação na disciplina.
-* **Comunidade:** Saber se devem evitar atualizações recentes em hardware antigo ("Devo ficar na versão 2020?").
-* **Maintainers:** Identificar necessidade de otimização ou decisão de descontinuar suporte oficial ao Atmega2560.
+### 5.2 Interesses e expectativas dos stakeholders
+* **Usuários:** Esperam uma resposta definitiva: "Devo atualizar meu firmware ou manter o antigo?".
+* **Mantenedores:** Interessados em identificar quais módulos específicos causaram maior impacto na performance para focar esforços de refatoração.
+* **Pesquisador:** Espera confirmar a hipótese de que a complexidade de código é a principal vilã da performance em MCUs limitados.
 
-### 5.3 Impactos potenciais
-* **Produto:** Possível recomendação oficial na Wiki do projeto sobre "Requisitos Mínimos de Versão".
-* **Processo:** Introdução de *checks* automatizados de complexidade no CI/CD do projeto original (sugestão futura).
+### 5.3 Impactos potenciais no processo / produto
+Se a hipótese for confirmada, o impacto pode ser a criação de uma versão "LTS" (Long Term Support) ou "Lite" do firmware, removendo funcionalidades modernas para recuperar performance em hardwares antigos. Isso mudaria o ciclo de release do produto.
 
 ---
 
 ## 6. Riscos de alto nível, premissas e critérios de sucesso
 
 ### 6.1 Riscos de alto nível
-* **Técnico (Toolchain):** Falha na compilação de versões >5 anos devido a dependências de bibliotecas externas que mudaram.
-* **Dados (Inconsistência):** O *Loop Rate* oscilar demais (Jitter alto), dificultando a definição de uma média confiável.
-* **Ambiente:** Queima da porta Serial/USB do Arduino devido a conexões/desconexões frequentes.
+* **Risco Técnico:** Versões muito antigas (2016/2017) podem não compilar na IDE atual devido a mudanças em bibliotecas do C++. *Mitigação:* Usar containers Docker com ambientes de compilação da época.
+* **Risco de Dados:** O software de monitoramento (TunerStudio) pode não conseguir conectar com protocolos de comunicação serial antigos. *Mitigação:* Baixar versões antigas do TunerStudio compatíveis.
 
-### 6.2 Critérios de sucesso globais
-* Obtenção de dados completos (Métricas Estáticas + Dinâmicas) para no mínimo **4 versões** diferentes.
-* Identificação de uma tendência clara (seja ela correlação positiva, negativa ou nula) com significância estatística visível em gráficos de dispersão.
+### 6.2 Critérios de sucesso globais (go / no-go)
+O experimento será considerado um sucesso se conseguirmos coletar dados válidos de pelo menos **5 anos distintos** de releases e se a variância dos dados entre as execuções for baixa (Desvio Padrão < 5%), garantindo confiabilidade estatística.
 
 ### 6.3 Critérios de parada antecipada
-* Se as versões antigas não compilarem mesmo após 3 tentativas de ajuste de ambiente (Docker/VM).
-* Se o *Loop Rate* for fixo (travado via software) em todas as versões, eliminando a variável dependente.
+Se descobrirmos que o *Loop Rate* é limitado artificialmente por software (ex: um comando `delay()` fixo em todas as versões), o experimento deve ser cancelado ou pivotado, pois a variável dependente não seria livre para variar.
+
+---
+
+## 7. Modelo conceitual e hipóteses
+
+### 7.1 Modelo conceitual do experimento
+O modelo baseia-se na teoria de que cada instrução condicional e cada linha de código adicional consome ciclos de clock da CPU.
+* **Fator (Causa):** Evolução das versões do firmware (que traz consigo o aumento da Complexidade Ciclomática e Tamanho do Binário).
+* **Efeito (Resposta):** Redução da frequência de *Loop* (Hz), pois o processador leva mais tempo para completar um ciclo de verificação de sensores e cálculos.
+
+### 7.2 Hipóteses formais (H0, H1)
+Para a Questão de Pesquisa principal (QP3 - Correlação):
+
+* **Hipótese Nula ($H_0$):** Não existe correlação estatisticamente significativa entre a Complexidade Ciclomática média do firmware e o *Loop Rate* (Correlação $\rho = 0$). Isso implicaria que a otimização do compilador ou a arquitetura anulam o efeito da complexidade.
+* **Hipótese Alternativa ($H_1$):** Existe uma correlação negativa estatisticamente significativa entre a Complexidade Ciclomática e o *Loop Rate* ($\rho < 0$). Ou seja, à medida que a complexidade sobe, o desempenho cai.
+
+### 7.3 Nível de significância e considerações de poder
+* **Nível de Significância ($\alpha$):** 0,05 (5%). Rejeitaremos a hipótese nula se o valor-p for menor que 0,05.
+* **Poder Estatístico:** Como faremos múltiplas medições (30 repetições) para cada versão, esperamos um poder estatístico alto (> 0.8) para detectar até mesmo pequenas degradações de desempenho.
+
+---
+
+## 8. Variáveis, fatores, tratamentos e objetos de estudo
+
+### 8.1 Objetos de estudo
+Os objetos de estudo são os **artefatos de software** (código-fonte e binários compilados) das versões estáveis do Speeduino (ex: 2017.08, 2018.08, 2019.05, 2020.12, 2022.01, 2024.02).
+
+### 8.2 Sujeitos / participantes (visão geral)
+Neste experimento *in silico*, não há participantes humanos. O "sujeito" que executa a tarefa é o **Microcontrolador ATmega2560**. Trataremos cada ciclo de execução de 60 segundos como um "participante" ou "sessão" para fins estatísticos.
+
+### 8.3 Variáveis independentes (fatores) e seus níveis
+* **Fator:** Versão do Firmware.
+* **Níveis:** 6 níveis (6 versões diferentes selecionadas ao longo do tempo).
+* *Nota:* A complexidade ciclomática é uma variável intrínseca ao nível do fator "Versão".
+
+### 8.4 Tratamentos (condições experimentais)
+Cada tratamento corresponde ao *upload* e execução de uma versão específica do firmware no hardware.
+* **Tratamento 1:** Speeduino v2017.
+* **Tratamento 2:** Speeduino v2018.
+* ...
+* **Tratamento 6:** Speeduino v2024.
+
+### 8.5 Variáveis dependentes (respostas)
+* **Loop Rate (Hz):** Número de vezes que o laço principal `void loop()` é executado por segundo.
+* **SRAM Usage (%):** Percentual de memória RAM ocupada (medida secundária).
+
+### 8.6 Variáveis de controle / bloqueio
+Para garantir que a diferença observada seja *apenas* pelo código:
+* **Hardware:** O mesmo Arduino Mega será usado em todos os testes.
+* **Configuração (Tune):** O mesmo arquivo de calibração base (`base_tune.msq`) será carregado.
+* **Cabo USB:** O mesmo cabo e porta USB.
+* **Temperatura:** Ambiente climatizado (~24°C) para evitar *thermal throttling* (embora raro em AVR).
+
+### 8.7 Possíveis variáveis de confusão conhecidas
+* **Ruído na Serial:** A comunicação com o PC para ler os dados consome CPU. Se o protocolo mudou drasticamente entre versões, isso pode confundir os resultados. *Controle:* Usar a mesma taxa de transmissão (Baud Rate 115200) sempre.
+
+---
+
+## 9. Desenho experimental
+
+### 9.1 Tipo de desenho
+Utilizaremos um **Desenho de Um Fator (One-Factor Design)** com níveis fixos (as versões). É um estudo longitudinal quase-experimental.
+
+### 9.2 Randomização e alocação
+Como é uma série temporal, não faz sentido randomizar a ordem das versões para análise de tendência, mas para a **execução do experimento**, a ordem dos tratamentos será randomizada (ex: testar 2020, depois 2017, depois 2024) para evitar que fatores ambientais progressivos (como aquecimento do PC ou instabilidade da fonte de energia) favoreçam ou prejudiquem uma versão específica.
+
+### 9.3 Balanceamento e contrabalanço
+O experimento será balanceado: cada versão (nível) terá exatamente o mesmo número de repetições (n=30).
+
+### 9.4 Número de grupos e sessões
+* **Grupos:** 6 grupos (um para cada versão).
+* **Sessões:** 30 sessões de medição de 60 segundos por grupo.
+* **Total de medições:** 180 pontos de dados.
+
+---
+
+## 10. População, sujeitos e amostragem
+
+### 10.1 População-alvo
+A população alvo são todas as releases oficiais do projeto Speeduino desde seu início até hoje.
+
+### 10.2 Critérios de inclusão de sujeitos (Versões)
+* Ser uma release marcada como "Stable" ou "Official" no GitHub.
+* Ter código-fonte disponível e compilável.
+* Suportar nativamente o chip ATmega2560.
+
+### 10.3 Critérios de exclusão de sujeitos
+* Versões que requerem hardware customizado não padrão.
+* Versões que falham na compilação devido a bibliotecas perdidas.
+
+### 10.4 Tamanho da amostra planejado
+Selecionaremos **6 versões** espaçadas temporalmente. Para cada versão, coletaremos **30 amostras de Loop Rate médio**. O número 30 é escolhido baseando-se no Teorema do Limite Central, permitindo assumir normalidade na distribuição das médias para os testes estatísticos.
+
+### 10.5 Método de seleção
+Amostragem sistemática: Selecionar a primeira release estável de cada ano (ex: Fev/2017, Fev/2018, etc.).
+
+### 10.6 Treinamento e preparação
+Como o executor é o próprio pesquisador, a preparação envolve o estudo da documentação de compilação de versões antigas e preparação do ambiente de *toolchain*.
+
+---
+
+## 11. Instrumentação e protocolo operacional
+
+### 11.1 Instrumentos de coleta
+1.  **Script Python (Lizard):** Para varrer as pastas do código e gerar um CSV com `NLOC` e `CCN` de cada arquivo.
+2.  **TunerStudio MS:** Para conectar à ECU e gerar logs de dados (`.mlg`) contendo a variável `LoopPerSecond`.
+3.  **Planilha Eletrônica:** Para tabular os dados manuais.
+
+### 11.2 Materiais de suporte
+* Repositório GitHub do Speeduino clonado.
+* Arduino IDE versão 1.8.19 (Versão legada estável).
+* Drivers CH340 para comunicação serial.
+
+### 11.3 Procedimento experimental (protocolo – visão passo a passo)
+Para cada uma das 6 versões selecionadas:
+1.  **Limpeza:** Executar `git checkout tags/vYYYY.MM` e limpar pasta de build.
+2.  **Análise Estática:** Rodar script do Lizard e salvar `metricas_vYYYY.csv`.
+3.  **Compilação:** Abrir no Arduino IDE, compilar e fazer upload para a placa.
+4.  **Setup:** Abrir TunerStudio, criar novo projeto para esta versão, carregar `base_tune.msq`.
+5.  **Estabilização:** Aguardar 30 segundos com o sistema ligado.
+6.  **Coleta:** Iniciar o *Datalogging* no TunerStudio. Deixar rodar por 60 segundos. Parar log.
+7.  **Extração:** Abrir o log, calcular a média da coluna `Seconds` / `Loops` e registrar na planilha mestre.
+8.  **Repetição:** Repetir passos 5 a 7 por 30 vezes (ou extrair 30 janelas de tempo do log contínuo).
+9.  **Reset:** Desconectar a placa, limpar a memória (EEPROM Clear) antes da próxima versão.
+
+### 11.4 Plano de piloto
+Será realizado um piloto com apenas duas versões (a mais antiga e a mais nova) e 5 repetições. O objetivo é verificar se o TunerStudio consegue ler os logs de ambas corretamente. Se houver incompatibilidade de formato de log, o protocolo será ajustado para leitura direta via Monitor Serial (texto puro).
+
+---
+
+## 12. Plano de análise de dados (pré-execução)
+
+### 12.1 Estratégia geral de análise
+Os dados serão analisados para responder se "Mais código = Menos velocidade". Primeiro, faremos uma análise descritiva (gráficos de linha) para visualizar a tendência. Depois, usaremos testes inferenciais.
+
+### 12.2 Métodos estatísticos planejados
+1.  **Teste de Normalidade (Shapiro-Wilk):** Para verificar se os dados de *Loop Rate* seguem uma distribuição normal.
+2.  **Teste de Correlação (Pearson ou Spearman):** Se os dados forem normais, Pearson; se não, Spearman. Isso testará a força da relação entre CCN (variável métrica) e Hz (variável de desempenho).
+3.  **ANOVA (Análise de Variância) de um fator:** Para confirmar se a diferença de médias de performance entre as versões é estatisticamente significativa ou se é apenas ruído aleatório.
+4.  **Regressão Linear Simples:** Se houver alta correlação, traçar uma reta de regressão para prever o desempenho de versões futuras.
+
+### 12.3 Tratamento de dados faltantes e outliers
+* **Outliers:** Serão identificados pelo método de Boxplot (1.5 * IQR). Valores anômalos (ex: Loop Rate = 0 ou infinito devido a erro de conexão) serão descartados e uma nova medição será feita para recompor a amostra de 30.
+* **Dados faltantes:** Se uma versão não compilar, ela será substituída pela release imediatamente seguinte (ex: 2017.02 em vez de 2017.01).
+
+### 12.4 Plano de análise para dados qualitativos
+Não haverá dados qualitativos substanciais, exceto observações do pesquisador sobre dificuldades de compilação ("warnings" do compilador), que serão anotadas como metadados para discutir a "Saúde do Código".
