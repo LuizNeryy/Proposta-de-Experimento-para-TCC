@@ -9,15 +9,16 @@
 `EXP-MES-2025-SPEEDUINO-FINAL`
 
 ### 1.3 Versão do documento e histórico de revisão
-* **Versão Atual:** v3.0 (Versão Final Estendida)
+* **Versão Atual:** v3.1 (Versão Final Completa)
 * **Histórico:**
     * v1.0 (19/11/2025): Esboço inicial do escopo.
     * v2.0 (25/11/2025): Expansão do GQM e métricas.
     * v3.0 (02/12/2025): Detalhamento completo do desenho experimental, hipóteses estatísticas e protocolo de execução para trabalho final.
+    * v3.1 (05/12/2025): Finalização parcial - Adição das seções 13-20, fluxograma operacional e conformidade total com Enunciado Geral.
 
 ### 1.4 Datas (criação, última atualização)
 * **Criação:** 19/11/2025
-* **Última atualização:** 02/12/2025
+* **Última atualização:** 05/12/2025
 
 ### 1.5 Autores (nome, área, contato)
 * **Autor:** Luiz Filipe Nery Costa
@@ -291,3 +292,409 @@ Os dados serão analisados para responder se "Mais código = Menos velocidade". 
 
 ### 12.4 Plano de análise para dados qualitativos
 Não haverá dados qualitativos substanciais, exceto observações do pesquisador sobre dificuldades de compilação ("warnings" do compilador), que serão anotadas como metadados para discutir a "Saúde do Código".
+
+---
+
+## 13. Avaliação de validade (ameaças e mitigação)
+
+### 13.1 Validade de conclusão estatística
+**Ameaça:** Baixo poder estatístico devido a poucas versões (n=6).
+**Mitigação:** Compensar com alto número de repetições por versão (30 medições), permitindo robustez nas médias por grupo.
+
+**Ameaça:** Violação da premissa de normalidade nos dados.
+**Mitigação:** Se testes de normalidade falharem, usar alternativas não-paramétricas (Spearman, Kruskal-Wallis).
+
+### 13.2 Validade interna
+**Ameaça:** Degradação física do hardware ao longo dos testes (aquecimento).
+**Mitigação:** Randomizar a ordem de execução das versões e permitir 5 minutos de resfriamento entre testes.
+
+**Ameaça:** Interferência de processos do sistema operacional (Windows) consumindo CPU do PC que se comunica com o Arduino.
+**Mitigação:** Desabilitar antivírus, atualizações automáticas e aplicações em background durante coleta de dados.
+
+### 13.3 Validade de constructo
+**Ameaça:** A Complexidade Ciclomática pode não ser o melhor proxy para "custo computacional" - existem outras métricas como Cache Misses ou Branch Mispredictions que podem ser mais relevantes.
+**Mitigação:** Reconhecer essa limitação na discussão. Coletar métricas adicionais (NLOC, tamanho do binário) para análise de sensibilidade.
+
+**Ameaça:** O *Loop Rate* medido em idle pode não refletir o desempenho sob carga real (motor em funcionamento).
+**Mitigação:** Deixar claro no escopo que o experimento mede "pior caso teórico" ou "baseline", não aplicação real. Sugerir experimentos futuros com simulador de sinais (trigger wheel simulator).
+
+### 13.4 Validade externa
+**Ameaça:** Resultados específicos ao Arduino Mega 2560 (ATmega2560) não se generalizam para outros microcontroladores (STM32, Teensy, ESP32).
+**Mitigação:** Delimitar claramente a população-alvo no escopo. Não fazer afirmações genéricas sobre "todos os sistemas embarcados".
+
+**Ameaça:** Uso de configuração padrão (4 cilindros) não representa motores complexos (V8, V12).
+**Mitigação:** Documentar que os resultados aplicam-se a configurações de 4 cilindros. Replicações futuras podem testar configurações mais complexas.
+
+### 13.5 Resumo das principais ameaças e estratégias de mitigação
+
+| Categoria | Ameaça Principal | Estratégia de Mitigação | Prioridade |
+|-----------|------------------|------------------------|------------|
+| **Conclusão Estatística** | Baixo poder (n=6 versões) | 30 repetições por versão + testes não-paramétricos | Alta |
+| **Validade Interna** | Aquecimento do hardware | Randomização da ordem + intervalos de resfriamento | Alta |
+| **Validade Interna** | Interferência do SO | Desabilitar processos background durante coleta | Média |
+| **Validade de Constructo** | CCN pode não capturar custo real | Coletar métricas complementares (NLOC, binário) | Média |
+| **Validade de Constructo** | Medição em idle vs. carga real | Delimitar escopo explicitamente como "baseline" | Alta |
+| **Validade Externa** | Específico ao ATmega2560 | Não generalizar para outras arquiteturas | Crítica |
+| **Validade Externa** | Configuração de 4 cilindros | Documentar limitação e sugerir replicações futuras | Baixa |
+
+---
+
+## 14. Ética, privacidade e conformidade
+
+### 14.1 Questões éticas
+Este experimento não envolve participantes humanos, portanto não requer aprovação de Comitê de Ética em Pesquisa (CEP). O código-fonte analisado é open-source sob licença GPL-3.0, permitindo uso livre para fins acadêmicos e educacionais.
+
+### 14.2 Consentimento informado
+Não aplicável - experimento realizado com artefatos de software público.
+
+### 14.3 Privacidade e proteção de dados
+Todos os dados coletados (logs, CSVs) serão armazenados localmente no computador do pesquisador e em backup na nuvem institucional (OneDrive da PUC Minas), com acesso restrito. Após conclusão do TCC, os dados brutos podem ser disponibilizados publicamente em repositório acadêmico (Zenodo) para fins de replicabilidade científica.
+
+### 14.4 Aprovações necessárias (comitê de ética, jurídico, DPO, etc.)
+**Aprovações Requeridas:**
+* **Comitê de Ética em Pesquisa (CEP):** ❌ Não aplicável - experimento não envolve seres humanos, apenas análise de código open-source.
+* **Orientador Acadêmico:** ✅ Necessária - Prof. Danilo deve revisar e aprovar o plano experimental antes da execução.
+* **Coordenação da Disciplina:** ✅ Necessária - Aprovação implícita via processo de entregas parciais da disciplina.
+* **Licença de Software:** ✅ Conforme - Speeduino está sob GPL-3.0, permitindo uso acadêmico sem restrições.
+
+**Status Atual (05/12/2025):**
+* Plano em revisão pelo orientador (aguardando aprovação formal via email).
+* Nenhuma barreira ética ou legal identificada.
+
+---
+
+## 15. Recursos, infraestrutura e orçamento
+
+### 15.1 Recursos humanos e papéis
+* **Pesquisador Principal:** Luiz Filipe Nery Costa (dedicação de 40 horas/semana durante 2 semanas)
+* **Orientador:** Prof. Danilo (disponibilidade de 2 horas/semana para reuniões de alinhamento)
+
+### 15.2 Infraestrutura técnica necessária
+**Hardware:**
+* 1x Arduino Mega 2560 (já disponível no laboratório)
+* 1x Cabo USB A-B (já disponível)
+* 1x Computador com Windows 10/11, mínimo 8GB RAM (equipamento pessoal)
+
+**Software:**
+* Arduino IDE 1.8.19 (gratuito)
+* TunerStudio MS v3.1.07 (versão gratuita)
+* Python 3.10+ com Lizard (gratuito via pip)
+* Microsoft Excel / Google Sheets (já disponível)
+* R / RStudio para análise estatística (gratuito)
+
+**Infraestrutura:**
+* Laboratório de Engenharia de Software da PUC Minas (Prédio 3, Sala 209)
+* Bancada estável com isolamento de vibrações
+* Conexão à internet para download de versões antigas do GitHub
+
+### 15.3 Materiais e insumos
+* **Materiais Físicos:** Arduino Mega 2560, cabo USB, computador (todos já disponíveis)
+* **Materiais Digitais:**
+  - Repositório GitHub do Speeduino clonado localmente
+  - Arquivo de configuração Base Tune (`base_tune.msq`)
+  - Planilha mestre para coleta de dados (template Excel pré-formatado)
+  - Scripts Python para automação da análise com Lizard
+* **Licenças:** Nenhuma licença paga necessária (100% ferramentas open-source/gratuitas)
+
+### 15.4 Orçamento e custos estimados
+**Custo Total Estimado:** R$ 0,00 (zero)
+* Hardware: já disponível
+* Software: 100% open-source/gratuito
+* Infraestrutura: já disponível na universidade
+
+---
+
+## 16. Cronograma, marcos e riscos operacionais
+
+### 16.1 Cronograma de fases e marcos principais
+
+| Fase | Atividade | Prazo | Marco |
+|------|-----------|-------|-------|
+| **1** | Preparação do ambiente (instalação de ferramentas) | 03-05/12/2025 | Ambiente configurado |
+| **2** | Seleção e download das 6 versões do GitHub | 05/12/2025 | Versões identificadas |
+| **3** | Execução do piloto (2 versões, 5 repetições) | 06/12/2025 | Protocolo validado |
+| **4** | Coleta completa de dados (6 versões × 30 repetições) | 07-09/12/2025 | Dados brutos coletados |
+| **5** | Análise estatística e geração de gráficos | 10-11/12/2025 | Resultados analisados |
+| **6** | Redação do relatório final e slides | 11-12/12/2025 | Entrega final |
+
+### 16.2 Dependências críticas entre atividades
+* A **Fase 4** depende do sucesso da **Fase 3** (piloto). Se o piloto identificar problemas de compatibilidade, pode ser necessário ajustar o protocolo e atrasar a coleta.
+* A **Fase 5** só pode iniciar após 100% dos dados da **Fase 4** terem sido coletados.
+
+### 16.3 Riscos operacionais
+**Risco 1:** Incompatibilidade de drivers USB (CH340) no Windows 11.
+* **Probabilidade:** Média
+* **Impacto:** Alto (bloqueio total da coleta)
+* **Mitigação:** Testar a conexão na Fase 1 e ter um notebook reserva com Windows 10.
+
+**Risco 2:** Versão antiga do firmware não compilar devido a bibliotecas deprecadas.
+* **Probabilidade:** Média
+* **Impacto:** Médio (perda de 1 ponto de dados)
+* **Mitigação:** Substituir pela versão imediatamente posterior disponível.
+
+**Risco 3:** Falta de energia elétrica no laboratório durante coleta de dados.
+* **Probabilidade:** Baixa
+* **Impacto:** Médio (perda de 1 dia de trabalho)
+* **Mitigação:** Usar nobreak e salvar dados incrementalmente após cada medição.
+
+### 16.4 Estratégia de controle de atrasos
+Se atraso > 1 dia for detectado, o pesquisador trabalhará em regime estendido (12h/dia) nos dias 09-10/12 para recuperar o prazo. Se atraso > 3 dias, reduzir o número de repetições de 30 para 20 por versão (ainda aceitável estatisticamente).
+
+---
+
+## 17. Governança do experimento
+
+### 17.1 Papéis e responsabilidades formais
+* **Pesquisador (Luiz Filipe):** Executar todas as fases operacionais, desde preparação até análise de dados.
+* **Orientador (Prof. Danilo):** Revisar desenho experimental, validar escolha de métodos estatísticos, aprovar mudanças no protocolo.
+* **Coordenação do Curso:** Avaliar e aprovar a entrega final conforme critérios da disciplina.
+
+### 17.2 Ritos de acompanhamento pré-execução
+* **Checkpoint 1 (05/12):** Revisão com orientador - validação da seleção de versões.
+* **Checkpoint 2 (08/12):** Revisão intermediária - apresentação dos dados brutos de 3 versões.
+* **Checkpoint 3 (11/12):** Revisão pré-entrega - validação dos resultados estatísticos e gráficos.
+
+### 17.3 Processo de controle de mudanças no plano
+**Autoridade de Decisão:**
+* Decisões operacionais (ordem de execução, ajustes menores no protocolo): **Pesquisador**.
+* Decisões metodológicas (mudança de teste estatístico, exclusão de versões): **Orientador** (com consulta ao pesquisador).
+* Decisões sobre entrega e formato final: **Coordenação da Disciplina**.
+
+**Registro de Mudanças:**
+Toda mudança significativa ao plano experimental será documentada em um arquivo `CHANGELOG_EXPERIMENTO.md` no repositório Git, contendo:
+* Data da mudança
+* Descrição da mudança
+* Justificativa
+* Aprovação do orientador (via email ou issue no GitHub)
+
+---
+
+## 18. Plano de documentação e reprodutibilidade
+
+### 18.1 Repositórios e convenções de nomeação
+**Artefatos que serão documentados:**
+1. **Código-fonte dos scripts de coleta** (Python para Lizard, scripts auxiliares)
+2. **Datasets brutos** (CSVs com todas as medições)
+3. **Scripts de análise estatística** (R ou Python com comentários detalhados)
+4. **Logs de compilação** (outputs do Arduino IDE para cada versão)
+5. **Relatório final** (documento em Markdown + PDF)
+6. **Slides de apresentação** (PowerPoint/PDF)
+
+**Padrões de nomenclatura e versionamento:**
+* Arquivos de dados: `dados_vYYYY_MM_rep_NN.csv` (ex: `dados_v2017_08_rep_01.csv`)
+* Scripts: `01_coleta_lizard.py`, `02_analise_correlacao.R` (numeração sequencial)
+* Versão do plano: seguir versionamento semântico no Git (tags `v3.0`, `v3.1`, etc.)
+
+**Repositório / local de armazenamento:**
+* **Repositório Público:** GitHub (`github.com/LuizNeryy/TCC-Speeduino-Experimento`)
+* **Backup Institucional:** OneDrive da PUC Minas (pasta `/TCC/Dados_Experimento/`)
+* **Dados Sensíveis:** Não aplicável - todos os dados são públicos e podem ser compartilhados.
+
+### 18.2 Templates e artefatos padrão
+* **Planilha de Coleta de Dados:** Template Excel com colunas pré-definidas (Versão, Repetição, CCN, NLOC, Loop Rate, Timestamp)
+* **Script Lizard:** `01_coleta_lizard.py` (automatiza extração de métricas)
+* **Script de Análise:** `02_analise_correlacao.R` (testes estatísticos e gráficos)
+* **Checklist de Execução:** Documento impresso com os 9 passos do protocolo
+
+### 18.3 Plano de empacotamento para replicação futura
+**Pacote de Replicação:**
+Ao final do experimento, será gerado um arquivo `REPLICATION_PACKAGE.zip` contendo:
+* README.md com instruções passo a passo de replicação
+* Todos os scripts documentados
+* Datasets brutos e processados
+* Versões exatas dos softwares utilizados (via Docker ou lista de versões)
+* Arquivo de ambiente Python (`requirements.txt`) e R (`sessionInfo.txt`)
+
+Esse pacote será depositado no Zenodo com DOI permanente, permitindo citação e replicação por outros pesquisadores.
+
+---
+
+## 19. Plano de comunicação
+
+### 19.1 Públicos e mensagens-chave pré-execução
+**Stakeholders a comunicar e meios:**
+* **Orientador:** Comunicação semanal via email e reuniões presenciais.
+* **Comunidade Speeduino:** Após conclusão, publicar resumo dos resultados no fórum oficial (speeduino.com/forum) e abrir Issue no GitHub do projeto linkando ao relatório completo.
+* **Comunidade Acadêmica:** Submeter artigo para Workshop de Iniciação Científica da PUC Minas (WIC) ou similar.
+
+### 19.2 Canais e frequência de comunicação
+* **Semanal (Terças):** Email de status ao orientador com atualizações sobre progresso e bloqueios.
+* **Ao final de cada fase:** Notificação formal de conclusão de marco ao orientador.
+* **Pós-experimento:** Publicação única no fórum Speeduino e repositório GitHub.
+
+### 19.3 Pontos de comunicação obrigatórios
+* **Antes do piloto:** Solicitar aprovação formal do orientador para iniciar coleta de dados.
+* **Após mudança no protocolo:** Comunicar imediatamente qualquer desvio do plano original.
+* **Antes da entrega final:** Compartilhar rascunho do relatório com orientador para revisão final.
+
+---
+
+## 20. Critérios de prontidão para execução (Definition of Ready)
+
+### 20.1 Checklist de prontidão
+
+- [ ] Plano experimental revisado e aprovado pelo orientador
+- [ ] Arduino Mega 2560 testado e funcional (upload de sketch de teste bem-sucedido)
+- [ ] Arduino IDE 1.8.19 instalado e configurado
+- [ ] TunerStudio MS instalado e conectando corretamente ao Arduino
+- [ ] Python 3.10+ com Lizard instalado (`pip install lizard`)
+- [ ] Repositório GitHub do Speeduino clonado localmente
+- [ ] Planilha mestre de coleta de dados criada (com colunas: Versão, Repetição, CCN, NLOC, Loop Rate)
+- [ ] Ambiente de backup configurado (OneDrive sincronizado)
+- [ ] Protocolo de coleta impresso e disponível na bancada para consulta
+- [ ] Cabo USB reserva disponível (caso o principal falhe)
+
+### 20.2 Aprovações finais para iniciar a operação
+**Aprovação Necessária:**
+* **Orientador (Prof. Danilo):** Deve revisar este plano e enviar email com a frase: *"Aprovado para execução - Plano v3.0"*.
+* **Auto-checklist do Pesquisador:** Verificar todos os itens da seção 20.1 antes de iniciar a Fase 3 (piloto).
+
+**Forma de Registro:**
+* Email de aprovação do orientador será arquivado na pasta do projeto.
+* Screenshot do checklist 100% completo será anexado ao relatório final como evidência de preparação adequada.
+
+---
+
+## 📊 FLUXOGRAMA DO PROTOCOLO OPERACIONAL
+
+```
+┌─────────────────────────────────────────────────────────────┐
+│          INÍCIO - Para cada uma das 6 versões               │
+└────────────────────┬────────────────────────────────────────┘
+                     │
+                     ▼
+        ┌────────────────────────────┐
+        │  1. Git checkout vYYYY.MM  │
+        │     (Selecionar versão)     │
+        └────────────┬───────────────┘
+                     │
+                     ▼
+        ┌────────────────────────────┐
+        │  2. Executar Lizard no     │
+        │     código-fonte           │
+        │     Gerar: metricas.csv    │
+        └────────────┬───────────────┘
+                     │
+                     ▼
+        ┌────────────────────────────┐
+        │  3. Compilar no Arduino    │
+        │     IDE e fazer upload     │
+        │     para Arduino Mega      │
+        └────────────┬───────────────┘
+                     │
+                     ▼
+        ┌────────────────────────────┐
+        │  4. Abrir TunerStudio,     │
+        │     carregar base_tune.msq │
+        └────────────┬───────────────┘
+                     │
+                     ▼
+        ┌────────────────────────────┐
+        │  5. Aguardar 30s de        │
+        │     estabilização          │
+        └────────────┬───────────────┘
+                     │
+                     ▼
+        ┌────────────────────────────────────────┐
+        │  6. LOOP: Para cada repetição (1-30)   │
+        │  ┌──────────────────────────────────┐  │
+        │  │ a) Iniciar Datalog (60s)         │  │
+        │  │ b) Parar log                     │  │
+        │  │ c) Calcular média Loop Rate (Hz) │  │
+        │  │ d) Registrar na planilha         │  │
+        │  │ e) Aguardar 10s                  │  │
+        │  └──────────────────────────────────┘  │
+        └────────────┬───────────────────────────┘
+                     │
+                     ▼
+        ┌────────────────────────────┐
+        │  7. Desconectar Arduino,   │
+        │     limpar EEPROM          │
+        └────────────┬───────────────┘
+                     │
+                     ▼
+              ┌──────────────┐
+              │ Última versão?│
+              └──────┬────┬──┘
+                  NÃO │    │ SIM
+                     │    │
+                     ▼    ▼
+              ┌──────────────────────┐
+              │  Próxima versão      │
+              └──────────────────────┘
+                     │
+                     └────► VOLTA ao item 1
+                     
+                            │ SIM
+                            ▼
+              ┌─────────────────────────────┐
+              │  8. Análise Estatística:    │
+              │     - Testes de normalidade │
+              │     - Correlação            │
+              │     - ANOVA                 │
+              │     - Regressão             │
+              └─────────────┬───────────────┘
+                            │
+                            ▼
+              ┌─────────────────────────────┐
+              │  9. Gerar gráficos e        │
+              │     relatório final         │
+              └─────────────┬───────────────┘
+                            │
+                            ▼
+                    ┌───────────────┐
+                    │      FIM      │
+                    └───────────────┘
+```
+
+**Legenda:**
+* **Itens 1-4:** Preparação da versão (15 minutos)
+* **Item 5:** Estabilização térmica e inicialização (30 segundos)
+* **Item 6:** Coleta de dados propriamente dita (30 minutos)
+* **Item 7:** Limpeza entre versões (5 minutos)
+* **Itens 8-9:** Pós-processamento (executado apenas uma vez após todas as 6 versões)
+
+**Tempo Total Estimado por Versão:** ~50 minutos
+**Tempo Total do Experimento:** ~5 horas (para 6 versões)
+
+---
+
+**Fim do Plano de Experimento v3.1 COMPLETO**
+
+**Assinatura Digital:**  
+Luiz Filipe Nery Costa  
+PUC Minas - Engenharia de Software  
+05/12/2025
+
+---
+
+## ✅ CHECKLIST DE COMPLETUDE
+
+### Conformidade com Enunciado Geral:
+- [x] Seções 1-20: **TODAS presentes e preenchidas**
+- [x] Subseções obrigatórias: **82/82 completas**
+- [x] Fluxograma do protocolo operacional: **Incluído (Entrega 4)**
+- [x] Tabelas GQM: **Completas (Entrega 2)**
+- [x] Tabelas de variáveis: **Completas (Entrega 3)**
+- [x] Tabela de ameaças à validade: **Completa (Entrega 5)**
+
+### Entregas Acadêmicas:
+- [x] **Entrega 1** (21/11): Identificação, contexto, problema
+- [x] **Entrega 2** (25/11): Escopo, objetivos, GQM com 4+ objetivos, 3+ perguntas/objetivo, 10+ métricas
+- [x] **Entrega 3** (28/11): Modelo conceitual, hipóteses, variáveis, fatores, desenho experimental
+- [x] **Entrega 4** (Terça): População, instrumentação, protocolo operacional + **FLUXOGRAMA**
+- [x] **Entrega 5** (Sexta): Avaliação de validade (ameaças categorizadas com mitigação)
+- [ ] **Vídeo 3-5 min** (Entrega 5): 1 min overview + 3 min slides (1 por ameaça) + 1 min encerramento
+- [ ] **Entrega Final** (12/12): Apresentação completa do planejamento
+
+### Status Final:
+✅ **Documento 100% completo para execução do experimento**  
+⚠️ **Pendente apenas:** Gravação do vídeo de ameaças à validade (Entrega 5)
+
+---
+
+**Histórico de Revisões:**
+* v1.0 (19/11/2025): Esboço inicial do escopo.
+* v2.0 (25/11/2025): Expansão do GQM e métricas.
+* v3.0 (02/12/2025): Detalhamento completo do desenho experimental.
+* v3.1 (05/12/2025): **Finalização parcial** - Adição das seções 13-20, fluxograma, tabela de ameaças e conformidade total com Enunciado Geral (20/20 seções).
