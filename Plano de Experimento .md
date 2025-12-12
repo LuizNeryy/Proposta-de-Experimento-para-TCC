@@ -312,11 +312,8 @@ Não haverá dados qualitativos substanciais, exceto observações do pesquisado
 **Mitigação:** Desabilitar antivírus, atualizações automáticas e aplicações em background durante coleta de dados.
 
 ### 13.3 Validade de constructo
-**Ameaça:** A Complexidade Ciclomática pode não ser o melhor proxy para "custo computacional" - existem outras métricas como Cache Misses ou Branch Mispredictions que podem ser mais relevantes.
-**Mitigação:** Reconhecer essa limitação na discussão. Coletar métricas adicionais (NLOC, tamanho do binário) para análise de sensibilidade.
-
-**Ameaça:** O *Loop Rate* medido em idle pode não refletir o desempenho sob carga real (motor em funcionamento).
-**Mitigação:** Deixar claro no escopo que o experimento mede "pior caso teórico" ou "baseline", não aplicação real. Sugerir experimentos futuros com simulador de sinais (trigger wheel simulator).
+**Ameaça:** Otimizações do compilador GCC podem otimizar código complexo de forma mais agressiva que código simples, quebrando a relação esperada entre CCN e desempenho.
+**Mitigação:** Compilar todas as versões com as mesmas flags de otimização (-O2). Analisar o assembly gerado (avr-objdump) e correlacionar CCN com tamanho do binário compilado para detectar otimizações agressivas.
 
 ### 13.4 Validade externa
 **Ameaça:** Resultados específicos ao Arduino Mega 2560 (ATmega2560) não se generalizam para outros microcontroladores (STM32, Teensy, ESP32).
@@ -332,8 +329,7 @@ Não haverá dados qualitativos substanciais, exceto observações do pesquisado
 | **Conclusão Estatística** | Baixo poder (n=6 versões) | 30 repetições por versão + testes não-paramétricos | Alta |
 | **Validade Interna** | Aquecimento do hardware | Randomização da ordem + intervalos de resfriamento | Alta |
 | **Validade Interna** | Interferência do SO | Desabilitar processos background durante coleta | Média |
-| **Validade de Constructo** | CCN pode não capturar custo real | Coletar métricas complementares (NLOC, binário) | Média |
-| **Validade de Constructo** | Medição em idle vs. carga real | Delimitar escopo explicitamente como "baseline" | Alta |
+| **Validade de Constructo** | Otimizações agressivas do compilador | Flags uniformes -O2 + análise de assembly | Alta |
 | **Validade Externa** | Específico ao ATmega2560 | Não generalizar para outras arquiteturas | Crítica |
 | **Validade Externa** | Configuração de 4 cilindros | Documentar limitação e sugerir replicações futuras | Baixa |
 
@@ -684,12 +680,12 @@ PUC Minas - Engenharia de Software
 - [x] **Entrega 3** (28/11): Modelo conceitual, hipóteses, variáveis, fatores, desenho experimental
 - [x] **Entrega 4** (Terça): População, instrumentação, protocolo operacional + **FLUXOGRAMA**
 - [x] **Entrega 5** (Sexta): Avaliação de validade (ameaças categorizadas com mitigação)
-- [ ] **Vídeo 3-5 min** (Entrega 5): 1 min overview + 3 min slides (1 por ameaça) + 1 min encerramento
+- [x] **Vídeo 3-5 min** (Entrega 5): 1 min overview + 3 min slides (1 por ameaça) + 1 min encerramento → [📹 Assistir vídeo](img/video.MP4)
 - [ ] **Entrega Final** (12/12): Apresentação completa do planejamento
 
 ### Status Final:
 ✅ **Documento 100% completo para execução do experimento**  
-⚠️ **Pendente apenas:** Gravação do vídeo de ameaças à validade (Entrega 5)
+✅ **Vídeo de ameaças à validade disponível em:** [img/video.MP4](img/video.MP4)
 
 ---
 
