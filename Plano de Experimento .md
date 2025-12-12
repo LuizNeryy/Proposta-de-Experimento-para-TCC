@@ -664,31 +664,6 @@ PUC Minas - Engenharia de Software
 
 ---
 
-## ✅ CHECKLIST DE COMPLETUDE
-
-### Conformidade com Enunciado Geral:
-- [x] Seções 1-20: **TODAS presentes e preenchidas**
-- [x] Subseções obrigatórias: **82/82 completas**
-- [x] Fluxograma do protocolo operacional: **Incluído (Entrega 4)**
-- [x] Tabelas GQM: **Completas (Entrega 2)**
-- [x] Tabelas de variáveis: **Completas (Entrega 3)**
-- [x] Tabela de ameaças à validade: **Completa (Entrega 5)**
-
-### Entregas Acadêmicas:
-- [x] **Entrega 1** (21/11): Identificação, contexto, problema
-- [x] **Entrega 2** (25/11): Escopo, objetivos, GQM com 4+ objetivos, 3+ perguntas/objetivo, 10+ métricas
-- [x] **Entrega 3** (28/11): Modelo conceitual, hipóteses, variáveis, fatores, desenho experimental
-- [x] **Entrega 4** (Terça): População, instrumentação, protocolo operacional + **FLUXOGRAMA**
-- [x] **Entrega 5** (Sexta): Avaliação de validade (ameaças categorizadas com mitigação)
-- [x] **Vídeo 3-5 min** (Entrega 5): 1 min overview + 3 min slides (1 por ameaça) + 1 min encerramento → [📹 Assistir vídeo](img/video.MP4)
-- [ ] **Entrega Final** (12/12): Apresentação completa do planejamento
-
-### Status Final:
-✅ **Documento 100% completo para execução do experimento**  
-✅ **Vídeo de ameaças à validade disponível em:** [img/video.MP4](img/video.MP4)
-
----
-
 **Histórico de Revisões:**
 * v1.0 (19/11/2025): Esboço inicial do escopo.
 * v2.0 (25/11/2025): Expansão do GQM e métricas.
